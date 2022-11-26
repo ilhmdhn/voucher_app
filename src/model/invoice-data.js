@@ -28,6 +28,18 @@ const getInvoiceHint = (data) =>{
     });
 }
 
+const getInvoiceDetail = (ivc) =>{
+    return new Promise((resolve, reject) =>{
+        try{
+          const query = `
+          SELECT [Total_Kamar], []
+          `
+        }catch(err){
+    
+        }
+      })
+}
+
 module.exports = {
     getInvoiceHint
 }

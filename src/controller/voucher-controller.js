@@ -20,6 +20,14 @@ const getInvoiceCode = async(req, res) =>{
     }
 }
 
+const getInvoiceDetail = async(req, res) =>{
+  try{
+
+  }catch(err){
+    
+  }
+}
+
 const insertVoucher = async(req, res) =>{
     try{
         
@@ -58,4 +66,7 @@ const insertVoucher = async(req, res) =>{
     }
 }
 
-insertVoucher();
+module.exports = {
+  getInvoiceCode,
+  insertVoucher
+}
