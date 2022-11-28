@@ -1,6 +1,7 @@
 const {response} = require('../util/response-format')
 const logger = require('../util/logger');
 const { getInvoiceHint, getInvoiceData } = require('../model/invoice-data');
+const {outletInfoData} = require('../model/outlet-data');
 const axios = require('axios');
 
 const getInvoiceCode = async(req, res) =>{
@@ -47,28 +48,43 @@ const insertVoucher = async(req, res) =>{
         const email = req.body.email;
         const ktp = req.body.ktp;
 
+        const outletInfo = await outletInfoData();
+        const outletCode = outletInfo.outlet_code;
+        const invoiceData =  await getInvoiceData(invoice)
+
+        if(invoiceData.state == false){
+          res.send(response(false, null, 'invalid invoice'));
+          return;
+        }
+
+        const voucherCodeTemp = outletCode + invoiceData.data.transaction_date_for_voucher;
         const detailVoucher = {
-            outlet_code : "hp1",
+            voucher_code_temp: voucherCodeTemp,
+            outlet_code : outletCode,
             invoice_code : invoice,
             guest_name : name,
             guest_instagram : instagram,
             guest_phone : phone,
             guest_email : email,
             guest_ktp : ktp,
-            guest_charge : "1000",
-            transaction_date : "1nov2022"
+            guest_charge : invoiceData.data.original_fee,
+            transaction_date : invoiceData.data.transaction_date
           }
+
+          console.log('detailVoucher\n'+JSON.stringify(detailVoucher));
           const httpHeader ={
             'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
           }
-          axios.post('localhost:3025/voucher', 3000, httpHeader,{
+          axios.post('http://192.168.1.248:3025/voucher', 3000, httpHeader,{
             detailVoucher
           })
           .then((res) => {
             console.log(res);
+            res.send(response(true, null, 'Fail insert voucher'));
           })
           .catch((err) => {
             console.log(err);
+            res.send(response(false, null, 'Fail insert voucher'));
           });
     }catch(err){
         res.send(response(false, null, 'Fail insert voucher'));

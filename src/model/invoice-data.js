@@ -16,7 +16,6 @@ const getInvoiceHint = (data) =>{
                 ([Total_All] - [Service_Kamar] - [Tax_Kamar] - [Service_Penjualan] - [Tax_Penjualan]) >= 100000
             AND
                 Invoice LIKE '${data}%'`;
-            console.log('query '+query);
             sql.connect(sqlConfig, err=>{
                 if(err){
                     reject(`Can't connect to database\n${err}`);                    
@@ -48,7 +47,8 @@ const getInvoiceData = (ivc) =>{
             [Total_Penjualan] as fnb_charge, 
             ([Total_All] - [Service_Kamar] - [Tax_Kamar] - [Service_Penjualan] - [Tax_Penjualan]) as original_fee,
             [Total_All] as total_charge, 
-            CONVERT(varchar, [Date_Trans], 103) as transaction_date, 
+            CONVERT(varchar, [Date_Trans], 103) as transaction_date,
+            CONVERT(varchar, [Date_Trans], 12) as transaction_date_for_voucher,
             [Jenis_Kamar] as room_type 
         FROM 
             hp112.[dbo].[IHP_Ivc] 

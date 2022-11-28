@@ -1,8 +1,8 @@
 const response = (state, data, message = "succes") =>{
     return {
         state: state,
-        data: data,
-        message: message    
+        message: message,
+        data: data
     }
 }
 
