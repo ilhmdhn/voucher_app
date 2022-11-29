@@ -58,36 +58,40 @@ const insertVoucher = async(req, res) =>{
         }
 
         const voucherCodeTemp = outletCode + invoiceData.data.transaction_date_for_voucher;
-        const detailVoucher = {
-            voucher_code_temp: voucherCodeTemp,
-            outlet_code : outletCode,
-            invoice_code : invoice,
-            guest_name : name,
-            guest_instagram : instagram,
-            guest_phone : phone,
-            guest_email : email,
-            guest_ktp : ktp,
-            guest_charge : invoiceData.data.original_fee,
-            transaction_date : invoiceData.data.transaction_date
-          }
-
-          console.log('detailVoucher\n'+JSON.stringify(detailVoucher));
-          const httpHeader ={
-            'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
-          }
-          axios.post('http://192.168.1.248:3025/voucher', 3000, httpHeader,{
-            detailVoucher
-          })
-          .then((res) => {
-            console.log(res);
-            res.send(response(true, null, 'Fail insert voucher'));
-          })
-          .catch((err) => {
-            console.log(err);
-            res.send(response(false, null, 'Fail insert voucher'));
+          const instance = axios.create({
+            baseURL: 'http://192.168.1.248:3025/',
+            timeout: 1000,
+            headers: {
+              'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
+            }
           });
+            try {
+              const apiResponse = await instance.post("voucher", {
+                'voucher_code_temp': voucherCodeTemp,
+                'outlet_code' : outletCode,
+                'invoice_code' : invoice,
+                'guest_name' : name,
+                'guest_instagram' : instagram,
+                'guest_phone' : phone,
+                'guest_email' : email,
+                'guest_ktp' : ktp,
+                'guest_charge' : invoiceData.data.original_fee,
+                'transaction_date' : invoiceData.data.transaction_date
+              });
+              if(apiResponse.status == 200){
+                console.log('hasil server '+JSON.stringify(apiResponse.data));
+                res.send(response(apiResponse.data.state, null, apiResponse.data.message))
+              }else{
+                throw apiResponse.statusText;
+              }
+            } catch (error) {
+              console.error(error);
+              throw error;
+            }
+
     }catch(err){
         res.send(response(false, null, 'Fail insert voucher'));
+        logger.error('insertVoucher '+err);
     }
 }
 

@@ -62,6 +62,9 @@ const getInvoiceData = (ivc) =>{
                 reject(`Can't connect to database\n${err}`);                    
             }else{
                 new sql.Request().query(query, (err, result)=>{
+                    if(err){
+                        reject(`getInvoiceData query \n${err}\n${query}`)
+                    }
                     if(result.recordset.length>0){
                         resolve(response(true, result.recordset[0]));
                     }else{
