@@ -1,8 +1,9 @@
 const {response} = require('../util/response-format')
 const logger = require('../util/logger');
-const { getInvoiceHint, getInvoiceData } = require('../model/invoice-data');
+const { getInvoiceHint, getInvoiceData, updateVoucherEmailed } = require('../model/invoice-data');
 const {outletInfoData} = require('../model/outlet-data');
 const axios = require('axios');
+require('dotenv').config();
 
 const getInvoiceCode = async(req, res) =>{
     try{
@@ -51,6 +52,7 @@ const insertVoucher = async(req, res) =>{
         const outletInfo = await outletInfoData();
         const outletCode = outletInfo.outlet_code;
         const invoiceData =  await getInvoiceData(invoice)
+        const bcc_email = process.env.BCC_EMAIL;
 
         if(invoiceData.state == false){
           res.send(response(false, null, 'invalid invoice'));
@@ -60,13 +62,12 @@ const insertVoucher = async(req, res) =>{
         const voucherCodeTemp = outletCode + invoiceData.data.transaction_date_for_voucher;
           const instance = axios.create({
             baseURL: 'http://192.168.1.248:3025/',
-            timeout: 1000,
+            timeout: 30000,
             headers: {
               'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
             }
           });
-            try {
-              const apiResponse = await instance.post("voucher", {
+          const apiResponse = await instance.post("voucher", {
                 'voucher_code_temp': voucherCodeTemp,
                 'outlet_code' : outletCode,
                 'invoice_code' : invoice,
@@ -74,20 +75,20 @@ const insertVoucher = async(req, res) =>{
                 'guest_instagram' : instagram,
                 'guest_phone' : phone,
                 'guest_email' : email,
+                'bcc_email' : bcc_email,
                 'guest_ktp' : ktp,
                 'guest_charge' : invoiceData.data.original_fee,
                 'transaction_date' : invoiceData.data.transaction_date
-              });
-              if(apiResponse.status == 200){
-                console.log('hasil server '+JSON.stringify(apiResponse.data));
+            });
+          if(apiResponse.status == 200){
+                if(apiResponse.data.state){
+                  await updateVoucherEmailed(invoice);
+                }
                 res.send(response(apiResponse.data.state, null, apiResponse.data.message))
-              }else{
+          }else{
                 throw apiResponse.statusText;
-              }
-            } catch (error) {
-              console.error(error);
-              throw error;
-            }
+          }
+            
 
     }catch(err){
         res.send(response(false, null, 'Fail insert voucher'));

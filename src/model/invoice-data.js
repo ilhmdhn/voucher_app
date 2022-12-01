@@ -79,7 +79,38 @@ const getInvoiceData = (ivc) =>{
       });
 }
 
+const updateVoucherEmailed = (ivc) =>{
+    return new Promise((resolve)=>{
+        try{
+            const query = `
+                 UPDATE [dbo].[IHP_Ivc] SET [emailed_voucher] = 1 WHERE [Invoice] = '${ivc}'
+            `
+
+            sql.connect(sqlConfig, err=>{
+                if(err){
+                    logger.error(`Can't connect to database ${err}`);
+                    resolve(false);
+                }else{
+                    new sql.Request().query(query, (err, results) =>{
+                        if(err){
+                            logger.error(`updateVoucherEmailed query \n${err}\n${query}`);
+                            resolve(false);
+                        }else{
+                            logger.info('SUCCESS UPDATE VOUCHER EMAILED '+ivc)
+                            resolve(true);
+                        }
+                    })
+                }
+            })
+        }catch(err){
+            logger.error(`updateVoucherEmailed ${err}`);
+            resolve(false);
+        }
+    })
+}
+
 module.exports = {
     getInvoiceHint,
-    getInvoiceData
+    getInvoiceData,
+    updateVoucherEmailed
 }
