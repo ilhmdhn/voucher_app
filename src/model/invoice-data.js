@@ -79,6 +79,50 @@ const getInvoiceData = (ivc) =>{
       });
 }
 
+const getInvoicDetaileData = (ivc) =>{
+    return new Promise((resolve, reject) =>{
+        try{
+          const query = `
+        SELECT
+            [Invoice] as invoice, 
+            [Nama] as name, 
+            [Kamar] as room, 
+            [Total_Kamar] as room_charge, 
+            [Total_Penjualan] as fnb_charge, 
+            ([Total_All] - [Service_Kamar] - [Tax_Kamar] - [Service_Penjualan] - [Tax_Penjualan]) as original_fee,
+            [Total_All] as total_charge, 
+            CONVERT(varchar, [Date_Trans], 103) as transaction_date,
+            CONVERT(varchar, [Date_Trans], 12) as transaction_date_for_voucher,
+            [Jenis_Kamar] as room_type 
+        FROM 
+            hp112.[dbo].[IHP_Ivc] 
+        WHERE
+            ([Total_All] - [Service_Kamar] - [Tax_Kamar] - [Service_Penjualan] - [Tax_Penjualan]) >= 100000
+        AND
+            [Invoice] = '${ivc}'
+        `;
+        sql.connect(sqlConfig, err=>{
+            if(err){
+                reject(`Can't connect to database\n${err}`);                    
+            }else{
+                new sql.Request().query(query, (err, result)=>{
+                    if(err){
+                        reject(`getInvoiceData query \n${err}\n${query}`)
+                    }
+                    if(result.recordset.length>0){
+                        resolve(result.recordset);
+                    }else{
+                        resolve(false);
+                    }
+                });
+            }
+        });
+        }catch(err){
+            reject(`getInvoiceDetail ${err}`);
+        }
+      });
+}
+
 const updateVoucherEmailed = (ivc) =>{
     return new Promise((resolve)=>{
         try{
@@ -112,5 +156,6 @@ const updateVoucherEmailed = (ivc) =>{
 module.exports = {
     getInvoiceHint,
     getInvoiceData,
+    getInvoicDetaileData,
     updateVoucherEmailed
 }

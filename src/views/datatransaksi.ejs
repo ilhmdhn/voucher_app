@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+
+    <style>
+        label {
+    font-weight: bold;
+}
+h1 {
+    font-weight: bold;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.table {
+    margin-left: auto; 
+    margin-right: auto; 
+    height: 80%; 
+    font-size: 11px; 
+    position:static;
+}
+div.card-header {
+    background-color: #0d6efd;
+    color: white;
+}
+.loader {
+    display: none;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+.loading {
+    border: 10px solid #ccc;
+    width: 200px;
+    height: 200px;
+    border-radius: 70%;
+    border-top-color: #1ecd97;
+    border-left-color: #1ecd90;
+    animation: spin 1s infinite ease-in;
+}
+@keyframes spin {
+0% {
+    transform: rotate(0deg);
+}
+100% {
+    transform: rotate(360deg);
+}
+}
+div.resultBox {
+    display: none;
+}
+    </style>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <title>IVC/RCP</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-3">Generate Kode Voucher</h1>
+        <div class="card">
+            <div class="card-header">Kode Transaksi</div>
+            <div class="card-body">
+                <!-- <form id="inputForm"> -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Rcp/Ivc</label>
+                                <input type="text" name="invoice" id="autocomplete_search" class="form-control" placeholder="Tulis Receipt atau Invoice yang benar" required oninvalid="this.setCustomValidity('Tolong masukkan kode Invoice atau Receipt')" oninput="this.setCustomValidity('')" />
+                                <span id="search_result" style="position: absolute;"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Nama</label>
+                                <input type="text" name="nama" id="nama" class="form-control" required oninvalid="this.setCustomValidity('Tolong masukkan nama')" oninput="this.setCustomValidity('')" />
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="data_Invoice" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width:12% ;">Ivc/Rcp</th>
+                                        <th style="width:30% ;">Name</th>
+                                        <th style="width:6% ;">Room</th>
+                                        <th style="width:9% ;">Room Charge</th>
+                                        <th style="width:8% ;">Fnb Charge</th>
+                                        <th style="width:8% ;">Original Fee</th>
+                                        <th style="width:9% ;">Total Charge</th>
+                                        <th style="width:10% ;">Transaction Date</th>
+                                        <th style="width:8% ;">Room Type</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Instagram</label>
+                                <input type="text" name="ig" id="ig" class="form-control" required oninvalid="this.setCustomValidity('Tolong masukkan id instagram')" oninput="this.setCustomValidity('')" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Nomor HP</label>
+                                <input type="tel" name="no_hp" id="no_hp" class="form-control" required oninvalid="this.setCustomValidity('Tolong masukkan nomor handphone')" oninput="this.setCustomValidity(''); this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" name="email" id="email" class="form-control" required oninvalid="this.setCustomValidity('Tolong masukkan alamat email')" oninput="this.setCustomValidity('')" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>KTP</label>
+                                <input type="text" name="ktp" id="ktp" class="form-control" required oninvalid="this.setCustomValidity('Tolong masukkan nomor KTP')" oninput="this.setCustomValidity(''); this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <input type="button" id="generate" name="submit_button" class="btn btn-primary" value="Generate" onclick=" submitVoucher()" />
+                        <div class="resultBox" id="resultBox" style="width: 50%; height: fit-content; width: fit-content; padding: 10px 10px 5px 10px; color: white; border-radius: 5px; margin: auto; margin-top: -45px;">
+                            <p id="result"></p>
+                        </div>
+                    </div>
+                <!-- </form> -->
+            </div>
+        </div>
+    </div>
+    <!-- Loading -->
+    <div class="loader" id="loader">
+        <div class="loading"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+</html>
+<!--  Sumbit Voucher Function -->
+<script>
+    const submitVoucher = async () => {
+        var name = document.getElementById('nama').value;
+        var invoice = document.getElementById('autocomplete_search').value;
+        var instagram = document.getElementById('ig').value;
+        var phone = document.getElementById('no_hp').value;
+        var email = document.getElementById('email').value;
+        var ktp = document.getElementById('ktp').value;
+        var table = $('#data_invoice').DataTable();
+
+        if ( invoice == ""){
+            document.getElementById('autocomplete_search').reportValidity();
+            return;
+        } else if(name == ""){
+            document.getElementById('nama').reportValidity();
+            return;
+        } else if(instagram==""){
+            document.getElementById('ig').reportValidity();
+            return;
+        } else if(phone==""){
+            document.getElementById('no_hp').reportValidity();
+            return;
+        } else if(email==""){
+            document.getElementById('email').reportValidity();
+            return;
+        } else if(ktp==""){
+            document.getElementById('ktp').reportValidity();
+            return;
+        } 
+
+        loading();
+        document.getElementById('generate').style.pointerEvents = 'none';
+        document.getElementById('generate').style.backgroundColor = '#8080FF';
+        const apiResponse = await axios.post("/voucher", {
+            'name': name,
+            'invoice': invoice,
+            'instagram': instagram,
+            'phone': phone,
+            'email': email,
+            'ktp': ktp
+        })
+        console.log(apiResponse.data.message);
+        if(apiResponse.status === 200){
+            if(apiResponse.data.state){
+                document.getElementById('resultBox').style.backgroundColor='#4BB543';
+                document.getElementById('result').innerHTML =apiResponse.data.message
+            }else{
+                document.getElementById('resultBox').style.backgroundColor='#D0342C';
+                document.getElementById('result').innerHTML =apiResponse.data.message
+            }
+        }else{
+            document.getElementById('resultBox').style.backgroundColor='#D0342C';
+            document.getElementById('result').innerHTML =apiResponse.data.message
+        }
+        document.getElementById('generate').style.pointerEvents = 'auto';
+        document.getElementById('generate').style.backgroundColor = '#0d6efd'; 
+        endLoading();
+        messageBox();
+    }
+</script>
+<!-- Drop down list Invoice Function -->
+<script>
+    function load_data(query = '') {
+        fetch('/invoice-code?invoice=' + query + '').then(function (response) {
+            return response.json();
+        }).then(function (responseData) {
+            var html = '<ul class="list-group">';
+            if (responseData.data && responseData.data.length > 0) {
+                for (var count = 0; count < responseData.data.length; count++) {
+                    var regular_expression = new RegExp('(' + query + ')', 'gi');
+                    html += '<a href="#" class="list-group-item list-group-item-action" onclick="get_text(this)">' + responseData.data[count].invoice.replace(regular_expression, '<span class="text-primary fw-bold">$1</span>') + '</a>';
+                }
+            }
+            else {
+                html += '<a href="#" class="list-group-item list-group-item-action disabled">No Data Found</a>';
+            }
+            html += '</ul>';
+            document.getElementById('search_result').innerHTML = html;
+        });
+    }
+    var search_element = document.getElementById("autocomplete_search");
+    search_element.onkeyup = function () {
+        var query = search_element.value;
+        load_data(query);
+    };
+    search_element.onfocus = function () {
+        var query = search_element.value;
+        load_data(query);
+    };
+    function get_text(event) {
+        var invoice = event.textContent;
+        document.getElementById('autocomplete_search').value = invoice;
+        document.getElementById('search_result').innerHTML = '';
+    }
+</script>
+<!-- Show Table list Function -->
+<script>
+    $(document).ready(function () {
+        var dataTable = $('#data_Invoice').DataTable({
+            'dom': '',
+            'processing': true,
+            'serverSide': true,
+            'serverMethod': 'get',
+            'ajax': {
+                'url': '/invoice-detail'
+            },
+            'aaSorting': [],
+            'columns': [
+                { data: 'invoice' },
+                { data: 'name' },
+                { data: 'room' },
+                { data: 'room_charge' },
+                { data: 'fnb_charge' },
+                { data: 'original_fee' },
+                { data: 'total_charge' },
+                { data: 'transaction_date' },
+                { data: 'room_type' }
+            ],
+            'columnDefs': [
+                {
+                    "targets": [2, 3, 4, 5, 6, 7, 8],
+                    "className": "text-center",
+                }
+            ]
+        });
+        $('#search_result').click(function () {
+            dataTable.search($('#autocomplete_search').val()).draw();
+            clearInput();
+        });
+    });
+</script>
+<!-- Loading Function -->
+<script>
+    function loading() {
+        document.getElementById("loader").style.display = "block";
+    }
+    function endLoading() {
+        document.getElementById("loader").style.display = "none";
+    }
+</script>
+<!-- Message Timeout and Clear input Function -->
+<script>
+    function clearInput(){
+        document.getElementById("nama").value = "";
+        document.getElementById("ig").value = "";
+        document.getElementById("no_hp").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("ktp").value = "";
+    }
+    
+
+
+
+    function messageBox(){
+        $("#resultBox").fadeIn().delay(4000).fadeOut();
+    }
+</script>

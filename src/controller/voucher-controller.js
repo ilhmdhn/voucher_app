@@ -1,6 +1,6 @@
 const {response} = require('../util/response-format')
 const logger = require('../util/logger');
-const { getInvoiceHint, getInvoiceData, updateVoucherEmailed } = require('../model/invoice-data');
+const { getInvoiceHint, getInvoiceData, getInvoicDetaileData, updateVoucherEmailed } = require('../model/invoice-data');
 const {outletInfoData} = require('../model/outlet-data');
 const axios = require('axios');
 require('dotenv').config();
@@ -24,15 +24,20 @@ const getInvoiceCode = async(req, res) =>{
 
 const getInvoiceDetail = async(req, res) =>{
   try{
-    const ivc = req.query.invoice;
+    const ivc = req.query.search.value;
 
     if(ivc == '' || ivc == undefined || ivc == null){
         res.send(response(false, null, 'ivc not set'));
         return;
     }
 
-    const invoiceData =  await getInvoiceData(ivc)
-    res.send(response(true, invoiceData));
+    const invoiceData =  await getInvoicDetaileData(ivc)
+    res.json(
+      {
+        aaData: invoiceData
+      }
+    );
+
   }catch(err){
     res.send(response(false, null, 'error get invoice data'));
     logger.error(`getInvoiceDetail\n${err}`);
