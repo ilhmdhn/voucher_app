@@ -11,7 +11,9 @@ function createWindow () {
     });  
     const win = new BrowserWindow({
       width: 1280,
-      height: 720
+      height: 720,
+      icon:__dirname + '/icon.png',
+      title:"Voucher App"
     });
 
     win.webContents.session.clearStorageData();
@@ -22,6 +24,7 @@ function createWindow () {
       win.loadURL(`http://localhost:${port}`);
       win.focus();
       win.center();
+      win.setMenu(null);
 
       win.on('closed', (event)=>{
         win == null;
