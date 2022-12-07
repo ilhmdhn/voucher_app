@@ -3,7 +3,7 @@ const logger = require('../util/logger');
 const { getInvoiceHint, getInvoiceData, getInvoicDetaileData, updateVoucherEmailed } = require('../model/invoice-data');
 const {outletInfoData} = require('../model/outlet-data');
 const axios = require('axios');
-require('dotenv').config();
+const {preferences} = require('../model/setting-data');
 
 const getInvoiceCode = async(req, res) =>{
     try{
@@ -57,7 +57,7 @@ const insertVoucher = async(req, res) =>{
         const outletInfo = await outletInfoData();
         const outletCode = outletInfo.outlet_code;
         const invoiceData =  await getInvoiceData(invoice)
-        const bcc_email = process.env.BCC_EMAIL;
+        const fullOutletCode = preferences.outlet_code;
 
         if(invoiceData.state == false){
           res.send(response(false, null, 'invalid invoice'));
@@ -80,7 +80,7 @@ const insertVoucher = async(req, res) =>{
                 'guest_instagram' : instagram,
                 'guest_phone' : phone,
                 'guest_email' : email,
-                'bcc_email' : bcc_email,
+                'full_outlet_code' : fullOutletCode,
                 'guest_ktp' : ktp,
                 'guest_charge' : invoiceData.data.original_fee,
                 'transaction_date' : invoiceData.data.transaction_date

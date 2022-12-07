@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Tray, ipcMain } = require('electron');
-require('dotenv').config();
+const {preferences} = require('./src/model/setting-data');
 const path = require('path');
-const port = process.env.SERVER_PORT;
+const port = preferences.server_port;
 
 const createWindow = () => {
 

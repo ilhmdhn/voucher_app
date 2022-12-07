@@ -1,14 +1,14 @@
 const sql = require('mssql');
-const express = require('express');
-const app = express();
 const logger = require('../util/logger');
-require('dotenv').config();
+const {preferences} = require('../model/setting-data');
+
+console.log('dbinfo', preferences.db_user)
 
 const sqlConfig = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  server: process.env.DB_IP_SERVER,
+  user: preferences.db_user,
+  password: preferences.db_password,
+  database: preferences.db_name,
+  server: preferences.db_ip,
   pool: {
     max: 10,
     min: 0,
@@ -24,8 +24,8 @@ const connectionDbCheck = () =>{
   return new Promise((resolve, reject)=>{
     let connectionStatus = {
       "connected": false,
-      "database_name": process.env.DB_NAME,
-      "database_ip": process.env.DB_IP_SERVER,
+      "database_name": preferences.db_name,
+      "database_ip": preferences.db_ip,
       "message": ""
   }
     try{
@@ -33,8 +33,8 @@ const connectionDbCheck = () =>{
         if(err){
           connectionStatus = {
             "connected": false,
-            "database_name": process.env.DB_NAME,
-            "database_ip": process.env.DB_IP_SERVER,
+            "database_name": preferences.db_name,
+            "database_ip": preferences.db_ip,
             "message": `Database connection failed \n ${err}`
         }
           logger.error(`Error Connect To Database \n ${err}`)
@@ -42,8 +42,8 @@ const connectionDbCheck = () =>{
         }else{
           connectionStatus = {
             "connected": true,
-            "database_name": process.env.DB_NAME,
-            "database_ip": process.env.DB_IP_SERVER,
+            "database_name": preferences.db_name,
+            "database_ip": preferences.db_ip,
             "message": "Success"
         }
         resolve(connectionStatus)
@@ -53,8 +53,8 @@ const connectionDbCheck = () =>{
       logger.error(`Error Check Database Connection \n ${err}`)
       connectionStatus = {
         "connected": false,
-        "database_name": process.env.DB_NAME,
-        "database_ip": process.env.DB_IP_SERVER,
+        "database_name": preferences.db_name,
+        "database_ip": preferences.db_ip,
         "message": err
     }
       resolve(connectionStatus)
