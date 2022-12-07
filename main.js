@@ -1,30 +1,37 @@
-const { app, BrowserWindow, Tray } = require('electron');
+const { app, BrowserWindow, Tray, ipcMain } = require('electron');
 require('dotenv').config();
+const path = require('path');
 const port = process.env.SERVER_PORT;
 
 const createWindow = () => {
 
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    icon: __dirname + '/icon.png',
+    title:"Voucher App",
+    autoHideMenuBar:true
+  });
   app.server = require(__dirname + '/src/index')
 
-  const additionalData = { myKey: 'myValue' }
+  const additionalData = { myKey: 'voucherapp' }
   const gotTheLock = app.requestSingleInstanceLock(additionalData)
-  console.log('single', gotTheLock)
 
-  if(!single){
-    process.exit(1);
-    app.quit();
-    return
+  if(!gotTheLock){
+    win.setSize(600, 400);
+    win.loadFile(path.join(__dirname, '/src/views/error.html'));
+    win.center();
+    win.focus();
+    win.show();
+    win.webContents.send('error-message', 'gtw');
+    // ipcMain.handle('error-message', async (event, arg) => {
+    //   event.returnValue = 'Aplikasi sudah dibukaa';
+    // });
+    // app.quit();
   }else{
-    const win = new BrowserWindow({
-      width: 1280,
-      height: 720,
-      icon: __dirname + '/icon.png',
-      title:"Voucher App"
-    });
     win.loadURL(`http://localhost:${port}`);
     win.focus();
     win.center();
-    win.setMenu(null);
   
     win.on('closed', (event)=>{
       win == null;
