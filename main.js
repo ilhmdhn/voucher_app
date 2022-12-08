@@ -10,7 +10,8 @@ const createWindow = () => {
     height: 720,
     icon: __dirname + '/icon.png',
     title:"Voucher App",
-    autoHideMenuBar:true
+    autoHideMenuBar:true,
+    enableRemoteModule: true
   });
   app.server = require(__dirname + '/src/index')
 
@@ -33,6 +34,11 @@ const createWindow = () => {
     win.focus();
     win.center();
   
+    win.webContents.session.clearStorageData();
+    win.webContents.session.clearCache(() => {
+        console.log("clear cache");
+    });
+
     win.on('closed', (event)=>{
       win == null;
       app.quit();

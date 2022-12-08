@@ -2,8 +2,6 @@ const sql = require('mssql');
 const logger = require('../util/logger');
 const {preferences} = require('../model/setting-data');
 
-console.log('dbinfo', preferences.db_user)
-
 const sqlConfig = {
   user: preferences.db_user,
   password: preferences.db_password,
@@ -33,8 +31,6 @@ const connectionDbCheck = () =>{
         if(err){
           connectionStatus = {
             "connected": false,
-            "database_name": preferences.db_name,
-            "database_ip": preferences.db_ip,
             "message": `Database connection failed \n ${err}`
         }
           logger.error(`Error Connect To Database \n ${err}`)
@@ -42,8 +38,6 @@ const connectionDbCheck = () =>{
         }else{
           connectionStatus = {
             "connected": true,
-            "database_name": preferences.db_name,
-            "database_ip": preferences.db_ip,
             "message": "Success"
         }
         resolve(connectionStatus)
@@ -53,8 +47,6 @@ const connectionDbCheck = () =>{
       logger.error(`Error Check Database Connection \n ${err}`)
       connectionStatus = {
         "connected": false,
-        "database_name": preferences.db_name,
-        "database_ip": preferences.db_ip,
         "message": err
     }
       resolve(connectionStatus)

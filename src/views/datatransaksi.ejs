@@ -60,7 +60,9 @@ div.resultBox {
     <div class="container">
         <h1 class="text-center mt-3 mb-3">Generate Kode Voucher</h1>
         <div class="card">
-            <div class="card-header">Kode Transaksi</div>
+            <div class="card-header" style="text-align:center-left;">Kode Transaksi
+                <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; float:right; font-weight: 400;" value="Setting" onclick="movePreferences()"/>
+            </div>
             <div class="card-body">
                 <!-- <form id="inputForm"> -->
                     <div class="row">
@@ -182,7 +184,6 @@ div.resultBox {
             'email': email,
             'ktp': ktp
         })
-        console.log(apiResponse.data.message);
         if(apiResponse.status === 200){
             if(apiResponse.data.state){
                 document.getElementById('resultBox').style.backgroundColor='#4BB543';
@@ -199,6 +200,10 @@ div.resultBox {
         document.getElementById('generate').style.backgroundColor = '#0d6efd'; 
         endLoading();
         messageBox();
+    }
+
+    const movePreferences = () =>{
+        window.location.href = "/preferences";
     }
 </script>
 <!-- Drop down list Invoice Function -->
