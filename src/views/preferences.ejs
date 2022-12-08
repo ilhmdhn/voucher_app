@@ -74,7 +74,7 @@
 		                	<input type="button" name="submit_button" class="btn btn-primary" value="Submit" onclick="postData()"/>
                       <input type="button" name="button_test" class="btn btn-primary" style="float:right" value="Connection Test" onclick="connectionTest()"/>
 		                </div>
-
+                    <p id="text_connection_state" style="color:green">Status Koneksi</p>
 					</form>
 				</div>
 			</div>
@@ -84,8 +84,10 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 
     <script>
+
     $( document ).ready(()=>{
         getValue()
+        document.getElementById('text_connection_state').style.display = "none";
       });
   
       const backToHome = () =>{
@@ -117,7 +119,9 @@
             'database_password': databasePassword
         });
         if(postResponse.data.state == false){
-          alert(postResponse.data.message)
+          document.getElementById('text_connection_state').style.display = "block";
+          document.getElementById('text_connection_state').style.color = "red";
+          document.getElementById('text_connection_state').innerHTML = postResponse.data.message;
         }else{
           window.location.href = "/"
         }
@@ -126,9 +130,12 @@
       const connectionTest = async() =>{
         const apiResponse = await axios.get('/connection-test');
         if(apiResponse.data.state == true){
-          alert(`Status Koneksi: ${apiResponse.data.data.connected}\nMessage: ${apiResponse.data.data.message}`);
+          document.getElementById('text_connection_state').style.display = "block";
+          document.getElementById('text_connection_state').innerHTML = `Status Koneksi: ${apiResponse.data.data.connected}<br>Message: ${apiResponse.data.data.message}`;
         }else{
-          alert(`Message :${apiResponse.data.message}`);
+          document.getElementById('text_connection_state').style.display = "block";
+          document.getElementById('text_connection_state').style.color = "red";
+          document.getElementById('text_connection_state').innerHTML = `Status Koneksi: ${apiResponse.data.data.connected}<br>Message: ${apiResponse.data.data.message}`;
         }
   }
 </script>
