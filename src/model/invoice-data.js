@@ -51,7 +51,7 @@ const getInvoiceData = (ivc) =>{
             CONVERT(varchar, [Date_Trans], 12) as transaction_date_for_voucher,
             [Jenis_Kamar] as room_type 
         FROM 
-            hp112.[dbo].[IHP_Ivc] 
+            [dbo].[IHP_Ivc] 
         WHERE
             ([Total_All] - [Service_Kamar] - [Tax_Kamar] - [Service_Penjualan] - [Tax_Penjualan]) >= 100000
         AND
@@ -95,7 +95,7 @@ const getInvoicDetaileData = (ivc) =>{
             CONVERT(varchar, [Date_Trans], 12) as transaction_date_for_voucher,
             [Jenis_Kamar] as room_type 
         FROM 
-            hp112.[dbo].[IHP_Ivc] 
+            [dbo].[IHP_Ivc] 
         WHERE
             ([Total_All] - [Service_Kamar] - [Tax_Kamar] - [Service_Penjualan] - [Tax_Penjualan]) >= 100000
         AND

@@ -25,7 +25,6 @@ const setPreferences = async(req, res)=>{
 
 const getPreferences = async(req, res)=>{
     try{
-        console.log('settingannya', JSON.stringify(preferences));
         res.send(response(true, preferences))
     }catch(err){
         logger.error(`getPreferences\n${err}`);
