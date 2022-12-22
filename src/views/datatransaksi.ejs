@@ -122,7 +122,10 @@ div.resultBox {
                         </div>
                     </div>
                     <div class="mb-3">
-                        <input type="button" id="generate" name="submit_button" class="btn btn-primary" value="Generate" onclick=" submitVoucher()" />
+                        <input type="button" id="generate" name="submit_button" class="btn btn-primary" value="Generate" onclick=" submitVoucher()" /><br><br>
+                        <label>Atau import CSV</label><br>
+                        <input type="file" id="voucherFile" accept=".csv">
+                        <input type="button" onclick="submitCsv()" form="form_file" name="uploadFile" id="uploadFile" value="Upload" class="btn btn-primary"/>
                         <div class="resultBox" id="resultBox" style="width: 50%; height: fit-content; width: fit-content; padding: 10px 10px 5px 10px; color: white; border-radius: 5px; margin: auto; margin-top: -45px;">
                             <p id="result"></p>
                         </div>
@@ -144,6 +147,16 @@ div.resultBox {
 </html>
 <!--  Sumbit Voucher Function -->
 <script>
+
+
+    const submitCsv = async () =>{
+        const formData = new FormData();
+        const selectedFile = document.getElementById('voucherFile').files[0];
+
+        formData.append('voucherFile', selectedFile);
+        const apiResponse = await axios.post("/voucher-file", formData)
+    }
+
     const submitVoucher = async () => {
         var name = document.getElementById('nama').value;
         var invoice = document.getElementById('autocomplete_search').value;
