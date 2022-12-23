@@ -106,18 +106,77 @@ const insertVoucherFile = async (req, res) => {
   try {
     const fileCsv = req.file;
     const isiCsv = await csv().fromFile(fileCsv.path)
-    console.log(JSON.stringify(isiCsv));
-    let dataScheme = []
+    const outletInfo = await outletInfoData();
+    const outletCode = outletInfo.outlet_code;
+    const fullOutletCode = preferences.outlet_code;
 
-    for(i=0; i<isiCsv.length; i++){
-      dataScheme.push({
-        kode_invoice: isiCsv[i]["Kode Invoice"],
-      })
+    let dataInvoice = []
+    for(let i=0; i<isiCsv.length; i++){
+      let invoiceData = await getInvoiceData(isiCsv[i].invoice)
+      if (invoiceData.state == false) 
+          { continue; }
+        const voucherCodeTemp = outletCode + invoiceData.data.transaction_date_for_voucher;
+        dataInvoice.push({
+          voucher_code_temp: voucherCodeTemp,
+          outlet_code: outletCode,
+          invoice_code: isiCsv[i].invoice,
+          guest_name: isiCsv[i].nama,
+          guest_instagram: isiCsv[i].instagram,
+          guest_phone: isiCsv[i].hp,
+          guest_email: isiCsv[i].email,
+          full_outlet_code: fullOutletCode,
+          guest_ktp: isiCsv[i].ktp,
+          guest_charge: invoiceData.data.original_fee,
+          transaction_date: invoiceData.data.transaction_date
+        })
     }
-    console.log(dataScheme);
-    res.send(response(true, isiCsv));
+    
+    const instance = axios.create({
+      baseURL: 'http://192.168.1.248:3025/',
+      timeout: 30000,
+      headers: {
+        'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
+      }
+    });
+    const apiResponse = await instance.post("voucher-mass", {
+      'voucher': dataInvoice
+    });
+    if (apiResponse.status == 200) {
+      if (apiResponse.data.state) {
+        // await updateVoucherEmailed(invoice);
+      }
+      res.send(response(apiResponse.data.state, null, apiResponse.data.message))
+    } else {
+      throw apiResponse.statusText;
+    }
+
   } catch (err) {
     logger.error('insertVoucherFile\n'+err);
+    res.send(response(false, null, 'error'))
+  }
+}
+
+const getVoucherHistory = async(req, res)=>{
+  try{
+    const page = req.query.page;
+    const size = req.query.size;
+    const fullOutletCode = preferences.outlet_code;
+
+    const instance = axios.create({
+      baseURL: 'http://192.168.1.248:3025/',
+      timeout: 30000,
+      headers: {
+        'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
+      }
+    });
+    const apiResponse = await instance.get(`voucher-history?page=${page}&size=${size}&outlet_code=${fullOutletCode}`);
+    if (apiResponse.status == 200) {
+      res.send(response(apiResponse.data.state, apiResponse.data.data, apiResponse.data.message))
+    } else {
+      throw apiResponse.statusText;
+    }
+  }catch(err){
+    logger.error('getVoucherHistory\n'+err);
     res.send(response(false, null, 'error'))
   }
 }
@@ -126,5 +185,6 @@ module.exports = {
   getInvoiceCode,
   insertVoucher,
   getInvoiceDetail,
-  insertVoucherFile
+  insertVoucherFile,
+  getVoucherHistory
 }

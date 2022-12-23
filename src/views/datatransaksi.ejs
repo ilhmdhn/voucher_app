@@ -60,8 +60,9 @@ div.resultBox {
     <div class="container">
         <h1 class="text-center mt-3 mb-3">Generate Kode Voucher</h1>
         <div class="card">
-            <div class="card-header" style="text-align:center-left;">Kode Transaksi
-                <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; float:right; font-weight: 400;" value="Setting" onclick="movePreferences()"/>
+            <div class="card-header" style="text-align:center-left;">
+                <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; float:left; font-weight: 400; border-color: none;" value="History" onclick="moveHistory()"/>
+                <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; margin-left: 16px; float:left; font-weight: 400; border-color: none;" value="Setting" onclick="movePreferences()"/>
             </div>
             <div class="card-body">
                 <!-- <form id="inputForm"> -->
@@ -123,11 +124,17 @@ div.resultBox {
                     </div>
                     <div class="mb-3">
                         <input type="button" id="generate" name="submit_button" class="btn btn-primary" value="Generate" onclick=" submitVoucher()" /><br><br>
+                        <br>
+                        <div class="resultBox" id="resultBox" style="width: 50%; height: fit-content; width: fit-content; padding: 10px 10px 5px 10px; color: white; border-radius: 5px;">
+                            <p id="result"></p>
+    
+                        </div>
                         <label>Atau import CSV</label><br>
                         <input type="file" id="voucherFile" accept=".csv">
                         <input type="button" onclick="submitCsv()" form="form_file" name="uploadFile" id="uploadFile" value="Upload" class="btn btn-primary"/>
-                        <div class="resultBox" id="resultBox" style="width: 50%; height: fit-content; width: fit-content; padding: 10px 10px 5px 10px; color: white; border-radius: 5px; margin: auto; margin-top: -45px;">
-                            <p id="result"></p>
+                        <div class="resultBoxCSV" id="resultBoxCSV" style="width: 50%; height: fit-content; width: fit-content; padding: 10px 10px 5px 10px; color: white; border-radius: 5px;">
+                            <p id="resultCSV"></p>
+    
                         </div>
                     </div>
                 <!-- </form> -->
@@ -155,6 +162,23 @@ div.resultBox {
 
         formData.append('voucherFile', selectedFile);
         const apiResponse = await axios.post("/voucher-file", formData)
+
+        if(apiResponse.status === 200){
+            if(apiResponse.data.state){
+                document.getElementById('resultBoxCSV').style.backgroundColor='#4BB543';
+                document.getElementById('resultCSV').innerHTML =apiResponse.data.message
+            }else{
+                document.getElementById('resultBoxCSV').style.backgroundColor='#D0342C';
+                document.getElementById('resultCSV').innerHTML =apiResponse.data.message
+            }
+        }else{
+            document.getElementById('resultBoxCSV').style.backgroundColor='#D0342C';
+            document.getElementById('resultCSV').innerHTML =apiResponse.data.message
+        }
+        document.getElementById('generate').style.pointerEvents = 'auto';
+        document.getElementById('generate').style.backgroundColor = '#0d6efd'; 
+        endLoading();
+        messageBox();
     }
 
     const submitVoucher = async () => {
@@ -218,6 +242,10 @@ div.resultBox {
     const movePreferences = () =>{
         window.location.href = "/preferences";
     }
+
+    const moveHistory = function(){
+        window.location.href='/history';
+    }
 </script>
 <!-- Drop down list Invoice Function -->
 <script>
@@ -258,7 +286,10 @@ div.resultBox {
 <script>
     $(document).ready(function () {
         var dataTable = $('#data_Invoice').DataTable({
-            'dom': '',
+            // 'searching': false,
+            // 'paging': true,
+            // 'lengthChange':false,
+            'dom':'',
             'processing': true,
             'serverSide': true,
             'serverMethod': 'get',
@@ -314,5 +345,6 @@ div.resultBox {
 
     function messageBox(){
         $("#resultBox").fadeIn().delay(4000).fadeOut();
+        $("#resultBoxCSV").fadeIn().delay(4000).fadeOut();
     }
 </script>
