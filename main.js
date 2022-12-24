@@ -54,7 +54,7 @@ const createWindow = () => {
         app.quit();
     })
   
-  const tray = new Tray('icon.png');
+  const tray = new Tray(__dirname + '/icon.png');
     tray.on('click', ()=>{
       if(win.isVisible()){
         win.hide();

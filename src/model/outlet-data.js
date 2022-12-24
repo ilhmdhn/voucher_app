@@ -6,7 +6,7 @@ const outletInfoData = () =>{
     return new Promise((resolve, reject) =>{
         try{
             const query = `
-            SELECT [Outlet] outlet_code,[Nama_Outlet] outlet_name,[Alamat_Outlet] outlet_address FROM [dbo].[IHP_Config] WHERE [DATA] = '1'
+            SELECT [Outlet] outlet_code,[Nama_Outlet] outlet_name,SUBSTRING([Nama_Outlet], 1, 1) as outlet_initial ,[Alamat_Outlet] outlet_address FROM [dbo].[IHP_Config] WHERE [DATA] = '1'
             `;
 
             sql.connect(sqlConfig, err=>{

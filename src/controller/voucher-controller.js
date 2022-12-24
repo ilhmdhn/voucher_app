@@ -4,6 +4,7 @@ const { getInvoiceHint, getInvoiceData, getInvoicDetaileData, updateVoucherEmail
 const { outletInfoData } = require('../model/outlet-data');
 const axios = require('axios');
 const csv=require('csvtojson')
+const {connectionDbCheck} = require('../util/db-connection');
 const { preferences } = require('../model/setting-data');
 
 const getInvoiceCode = async (req, res) => {
@@ -65,7 +66,7 @@ const insertVoucher = async (req, res) => {
       return;
     }
 
-    const voucherCodeTemp = outletCode + invoiceData.data.transaction_date_for_voucher;
+    const voucherCodeTemp = outletInfo.outlet_initial +outletCode + invoiceData.data.transaction_date_for_voucher;
     const instance = axios.create({
       baseURL: 'http://192.168.1.248:3025/',
       timeout: 30000,
@@ -104,6 +105,16 @@ const insertVoucher = async (req, res) => {
 
 const insertVoucherFile = async (req, res) => {
   try {
+
+    const connectionCheck = await connectionDbCheck();
+
+    console.log('connectionCheck'+JSON.stringify(connectionCheck));
+
+    if(connectionCheck.connected == false){
+      res.send(response(false, null, 'Database not connected'));
+      return;
+    }
+
     const fileCsv = req.file;
     const isiCsv = await csv().fromFile(fileCsv.path)
     const outletInfo = await outletInfoData();
@@ -115,12 +126,12 @@ const insertVoucherFile = async (req, res) => {
       let invoiceData = await getInvoiceData(isiCsv[i].invoice)
       if (invoiceData.state == false) 
           { continue; }
-        const voucherCodeTemp = outletCode + invoiceData.data.transaction_date_for_voucher;
+        const voucherCodeTemp = outletInfo.outlet_initial + outletCode + invoiceData.data.transaction_date_for_voucher;
         dataInvoice.push({
           voucher_code_temp: voucherCodeTemp,
           outlet_code: outletCode,
           invoice_code: isiCsv[i].invoice,
-          guest_name: isiCsv[i].nama,
+          guest_name: isiCsv[i]['nama sesuai ktp'],
           guest_instagram: isiCsv[i].instagram,
           guest_phone: isiCsv[i].hp,
           guest_email: isiCsv[i].email,
