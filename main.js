@@ -45,9 +45,9 @@ const createWindow = () => {
     })
   
     win.on('minimize', (event) =>{
-      event.preventDefault();
-      win.hide();
-    });
+       event.preventDefault();
+       win.hide();
+      });
   
     win.on('close', (event) =>{
         win == null;

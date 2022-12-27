@@ -61,7 +61,7 @@ div.resultBox {
         <h1 class="text-center mt-3 mb-3">Generate Kode Voucher</h1>
         <div class="card">
             <div class="card-header" style="text-align:center-left;">
-                <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; float:left; font-weight: 400; border-color: none;" value="History" onclick="moveHistory()"/>
+                <!-- <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; float:left; font-weight: 400; border-color: none;" value="History" onclick="moveHistory()"/> -->
                 <input type="button" class="btn btn-primary" style="background-color: transparent; color:white; margin-left: 16px; float:left; font-weight: 400; border-color: none;" value="Setting" onclick="movePreferences()"/>
             </div>
             <div class="card-body">
@@ -69,7 +69,7 @@ div.resultBox {
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label>Rcp/Ivc</label>
+                                <label>Kode Invoice</label>
                                 <input type="text" name="invoice" id="autocomplete_search" class="form-control" placeholder="Tulis Receipt atau Invoice yang benar" required oninvalid="this.setCustomValidity('Tolong masukkan kode Invoice atau Receipt')" oninput="this.setCustomValidity('')" />
                                 <span id="search_result" style="position: absolute;"></span>
                             </div>

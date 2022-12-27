@@ -1,6 +1,5 @@
 const sql = require("mssql");
 const {sqlConfig} = require('../util/db-connection');
-const logger = require('../util/logger');
 
 const outletInfoData = () =>{
     return new Promise((resolve, reject) =>{

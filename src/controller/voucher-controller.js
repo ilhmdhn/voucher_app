@@ -3,7 +3,7 @@ const logger = require('../util/logger');
 const { getInvoiceHint, getInvoiceData, getInvoicDetaileData, updateVoucherEmailed } = require('../model/invoice-data');
 const { outletInfoData } = require('../model/outlet-data');
 const axios = require('axios');
-const csv=require('csvtojson')
+const csv = require('csvtojson')
 const {connectionDbCheck} = require('../util/db-connection');
 const { preferences } = require('../model/setting-data');
 
@@ -49,6 +49,13 @@ const getInvoiceDetail = async (req, res) => {
 const insertVoucher = async (req, res) => {
   try {
 
+    const connectionCheck = await connectionDbCheck();
+
+    if(connectionCheck.connected == false){
+      res.send(response(false, null, 'Database not connected'));
+      return;
+    }
+
     const name = req.body.name;
     const invoice = req.body.invoice;
     const instagram = req.body.instagram;
@@ -68,7 +75,7 @@ const insertVoucher = async (req, res) => {
 
     const voucherCodeTemp = outletInfo.outlet_initial +outletCode + invoiceData.data.transaction_date_for_voucher;
     const instance = axios.create({
-      baseURL: 'http://192.168.1.248:3025/',
+      baseURL: 'http://192.168.1.207:3025/',
       timeout: 30000,
       headers: {
         'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
@@ -108,8 +115,6 @@ const insertVoucherFile = async (req, res) => {
 
     const connectionCheck = await connectionDbCheck();
 
-    console.log('connectionCheck'+JSON.stringify(connectionCheck));
-
     if(connectionCheck.connected == false){
       res.send(response(false, null, 'Database not connected'));
       return;
@@ -123,28 +128,28 @@ const insertVoucherFile = async (req, res) => {
 
     let dataInvoice = []
     for(let i=0; i<isiCsv.length; i++){
-      let invoiceData = await getInvoiceData(isiCsv[i].invoice)
+      let invoiceData = await getInvoiceData(isiCsv[i]['INVOICE'])
       if (invoiceData.state == false) 
           { continue; }
         const voucherCodeTemp = outletInfo.outlet_initial + outletCode + invoiceData.data.transaction_date_for_voucher;
         dataInvoice.push({
           voucher_code_temp: voucherCodeTemp,
           outlet_code: outletCode,
-          invoice_code: isiCsv[i].invoice,
-          guest_name: isiCsv[i]['nama sesuai ktp'],
-          guest_instagram: isiCsv[i].instagram,
-          guest_phone: isiCsv[i].hp,
-          guest_email: isiCsv[i].email,
+          invoice_code: isiCsv[i]['INVOICE'],
+          guest_name: isiCsv[i]['NAMA SESUAI KTP'],
+          guest_instagram: isiCsv[i]['INSTAGRAM'],
+          guest_phone: isiCsv[i]['NOMOR TELFON'],
+          guest_email: isiCsv[i]['EMAIL'],
           full_outlet_code: fullOutletCode,
-          guest_ktp: isiCsv[i].ktp,
+          guest_ktp: isiCsv[i]['KTP'],
           guest_charge: invoiceData.data.original_fee,
           transaction_date: invoiceData.data.transaction_date
         })
     }
     
     const instance = axios.create({
-      baseURL: 'http://192.168.1.248:3025/',
-      timeout: 30000,
+      baseURL: 'http://192.168.1.207:3025/',
+      timeout: 120000,
       headers: {
         'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
       }
@@ -174,7 +179,7 @@ const getVoucherHistory = async(req, res)=>{
     const fullOutletCode = preferences.outlet_code;
 
     const instance = axios.create({
-      baseURL: 'http://192.168.1.248:3025/',
+      baseURL: 'http://192.168.1.207:3025/',
       timeout: 30000,
       headers: {
         'authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODc2MzUyNCwiaWF0IjoxNjY4NzYzNTI0fQ.vhvAqgf7Ie98XGf_plyboGnGSsECEtNIQ4VmG8BzsVs'
